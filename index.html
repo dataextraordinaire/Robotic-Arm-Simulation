@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Robotic Arm Simulation | Chris Adam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./script.js" defer></script>
+</head>
+<body>
+  <div id="app" class="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
+    <header class="bg-card border-b border-border py-4 px-6">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-foreground">
+          Built by Chris Adam | Robotics Strategy + Simulation
+        </h1>
+        
+        <div class="flex items-center space-x-4">
+          <a 
+            href="https://github.com/ChrisAdam"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="GitHub"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+          </a>
+        </div>
+      </div>
+    </header>
+    
+    <div class="flex items-center justify-center py-1 px-4 border-b border-border bg-card/50">
+      <div class="flex items-center gap-2">
+        <button 
+          id="basic-mode-btn"
+          class="inline-flex h-8 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><circle cx="12" cy="12" r="8"></circle><rect x="7" y="4.5" width="10" height="5" rx="2.5"></rect><path d="M12 12v2.5"></path><path d="m8.5 8.5 7 7"></path><path d="M15.5 8.5 17 10"></path></svg>
+          Basic Mode
+        </button>
+        <button 
+          id="advanced-mode-btn"
+          class="inline-flex h-8 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-muted-foreground"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M10 22v-8H2"></path><path d="M2 10V2h8"></path><path d="M22 2v8h-8"></path><path d="M14 22v-8h8"></path></svg>
+          Advanced Mode
+        </button>
+      </div>
+    </div>
+    
+    <div class="flex flex-col md:flex-row flex-1 w-full overflow-hidden">
+      <div class="flex-1 h-[50vh] md:h-full relative">
+        <canvas id="simulation-canvas" class="w-full h-full bg-background"></canvas>
+      </div>
+      
+      <div id="controls-panel" class="w-full md:w-80 lg:w-96 h-[50vh] md:h-full overflow-y-auto bg-card border-l border-border p-4 space-y-4">
+        <!-- Basic Controls -->
+        <div id="basic-controls">
+          <div class="card border rounded-lg bg-card shadow-sm">
+            <div class="py-3 px-4 border-b">
+              <h3 class="text-lg font-semibold">Target Position</h3>
+              <p class="text-sm text-muted-foreground">Set the target position for the robot arm</p>
+            </div>
+            <div class="p-4 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label for="target-x" class="text-sm font-medium">X Coordinate</label>
+                  <input
+                    id="target-x"
+                    type="text"
+                    value="3"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    placeholder="X position"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label for="target-y" class="text-sm font-medium">Y Coordinate</label>
+                  <input
+                    id="target-y"
+                    type="text"
+                    value="3"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    placeholder="Y position"
+                  />
+                </div>
+              </div>
+              <div class="flex justify-between">
+                <button id="set-target-btn" class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                  Set Target
+                </button>
+                <button id="reset-arm-btn" class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-muted-foreground">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Advanced Controls (hidden by default) -->
+        <div id="advanced-controls" class="hidden">
+          <div class="tabs">
+            <div class="tab-list flex border-b">
+              <button class="tab active px-4 py-2 font-medium" data-tab="obstacles">Obstacles</button>
+              <button class="tab px-4 py-2 font-medium" data-tab="trajectory">Trajectory</button>
+              <button class="tab px-4 py-2 font-medium" data-tab="analysis">Analysis</button>
+            </div>
+            
+            <div class="tab-content pt-4" id="tab-obstacles">
+              <div class="card border rounded-lg bg-card shadow-sm mb-4">
+                <div class="py-3 px-4 border-b">
+                  <h3 class="text-lg font-semibold">Add Obstacle</h3>
+                  <p class="text-sm text-muted-foreground">Add obstacles to test collision avoidance</p>
+                </div>
+                <div class="p-4 space-y-4">
+                  <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">X Position</label>
+                      <input
+                        id="obstacle-x"
+                        type="text"
+                        value="2"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Y Position</label>
+                      <input
+                        id="obstacle-y"
+                        type="text"
+                        value="2"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium">Radius</label>
+                      <input
+                        id="obstacle-radius"
+                        type="text"
+                        value="0.5"
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <button id="add-obstacle-btn" class="w-full inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                    Add Obstacle
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-content pt-4 hidden" id="tab-trajectory">
+              <div class="card border rounded-lg bg-card shadow-sm">
+                <div class="py-3 px-4 border-b">
+                  <h3 class="text-lg font-semibold">Trajectory Planning</h3>
+                  <p class="text-sm text-muted-foreground">Plan a path to the target position</p>
+                </div>
+                <div class="p-4 space-y-4">
+                  <div class="grid grid-cols-2 gap-4">
+                    <button id="linear-path-btn" class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium">
+                      Linear Path
+                    </button>
+                    <button id="curved-path-btn" class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                      Curved Path
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-content pt-4 hidden" id="tab-analysis">
+              <div class="card border rounded-lg bg-card shadow-sm mb-4">
+                <div class="py-3 px-4 border-b">
+                  <h3 class="text-lg font-semibold">Workspace Analysis</h3>
+                  <p class="text-sm text-muted-foreground">Analyze the capabilities of the robotic arm</p>
+                </div>
+                <div class="p-4 space-y-4">
+                  <button id="analyze-workspace-btn" class="w-full inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                    Analyze Workspace
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card border rounded-lg bg-card shadow-sm">
+                <div class="py-3 px-4 border-b">
+                  <h3 class="text-lg font-semibold">ML Trajectory Generation</h3>
+                  <p class="text-sm text-muted-foreground">Use machine learning for motion planning</p>
+                </div>
+                <div class="p-4 space-y-4">
+                  <button id="train-ml-btn" class="w-full inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M2 12a5 5 0 0 0 5 5 8 8 0 0 1 5 2 8 8 0 0 1 5-2 5 5 0 0 0 5-5c0-8-14-8-20 0Z"></path><path d="M6 9a1 1 0 0 0 0 2"></path><path d="M18 9a1 1 0 0 1 0 2"></path></svg>
+                    Train ML Model
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Results Card -->
+        <div class="card border rounded-lg bg-card shadow-sm transition-colors border-primary">
+          <div class="py-3 px-4 border-b">
+            <h3 class="text-lg font-semibold">Simulation Results</h3>
+            <p class="text-sm text-muted-foreground">Current arm status and calculations</p>
+          </div>
+          <div class="p-4 space-y-4" id="results-content">
+            <div class="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+              <p class="mb-2">No target position set</p>
+              <p class="text-sm">
+                Use the form above to set a target position for the robot arm
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
