@@ -15,7 +15,7 @@
 ---
 
 ### 🔗 Live Demo
-[View Project Live](https://dataextraordinaire.github.io/robotic-arm-simulation/)
+[View Project Live]([https://github.com/dataextraordinaire/Robotic-Arm-Simulation)
 
 ### 📁 Source Code
 [GitHub Repository](https://github.com/dataextraordinaire/robotic-arm-simulation)
